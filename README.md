@@ -7,14 +7,14 @@
 
 ## FUNCIÓN DEL PROGRAMA:
 > En este proyecto se le da al usuario un menu principal con diferentes opciones quedando este distribuido de la siguiente manera:
-> 1. OPERACIONES BASICAS
-    1. SUMA
-    2. RESTA
-    3. MULTIPLICACIÓN
-> 2. OPERACIONES CON CADENA
-> 3. JUEGO
-> 4. SERIE DE FIBONACCI
-> 5. SALIR DEL PROGRAMA
+>1. OPERACIONES BASICAS
+    - SUMA
+    - RESTA
+    - MULTIPLICACIÓN
+>2. OPERACIONES CON CADENA
+>3. JUEGO
+>4. SERIE DE FIBONACCI
+>5. SALIR DEL PROGRAMA
 >
 > Donde cada interacción del usuario con el programa esta validado y comprobado el correcto funcionamiento.
 
