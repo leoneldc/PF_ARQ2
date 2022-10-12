@@ -8,9 +8,9 @@
 ## FUNCIÓN DEL PROGRAMA:
 > En este proyecto se le da al usuario un menu principal con diferentes opciones quedando este distribuido de la siguiente manera:
 > 1. OPERACIONES BASICAS
-    1. SUMA
-    2. RESTA
-    3. MULTIPLICACIÓN
+    - SUMA
+    - RESTA
+    - MULTIPLICACIÓN
 > 2. OPERACIONES CON CADENA
 > 3. JUEGO
 > 4. SERIE DE FIBONACCI
