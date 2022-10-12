@@ -7,7 +7,7 @@
 
 ## FUNCIÓN DEL PROGRAMA:
 En este proyecto se le da al usuario un menu principal con diferentes opciones quedando este distribuido de la siguiente manera:
-1. OERACIONES BASICAS
+1. OPERACIONES BASICAS
    - SUMA
    - RESTA
    - MULTIPLICACIÓN
@@ -18,6 +18,14 @@ En este proyecto se le da al usuario un menu principal con diferentes opciones q
 
 Donde cada interacción del usuario con el programa esta validado y comprobado el correcto funcionamiento.
 
+### OPERACIOENS BASICAS:
+> Si fue seleccionada esta opción, el usuario tendra tres funciones a elegir.
+>
+>Si elige la de sumar, el programa le pedirá ingresar dos números de dos digitos para realizar la suma.
+>
+>Si elige la de restar, el programa le pedirá ingresar dos números de dos digitos para realizar la resta.
+>
+>Si elige la de multiplicación, el programa le pedirá ingresar dos números, el primero sería el multiplicando de dos digitos y el multiplicador seria unicamente de un digíto.
 
 ## TECNOLOGIA:
 > Lenguaje Ensamblador
