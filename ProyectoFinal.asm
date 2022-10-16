@@ -224,7 +224,7 @@ ret
         cmp al,32h
         je opcion1
         cmp al,33h
-        je opcion1
+        je pcs_multiplicacion
         cmp al,34h
         je inicio
         jne pcs_validarMenuOperacionesBasicas           
@@ -240,10 +240,15 @@ ret
         int 10h 
         ;mostramos en pantalla
         mov ah,09h
-        lea dx, sumaIndicacion1
+        lea dx, pedirNum1
         int 21h
         
         val1PrimerDigito:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 45 ;columna  
+        mov ah, 2
+        int 10h
         ;guardamos el primer digito del primer numero            
         mov ah,01h
         int 21h
@@ -254,7 +259,12 @@ ret
         sub al,30h
         mov bl,al
         
-        val2PrimerDigito: 
+        val2PrimerDigito:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 46 ;columna  
+        mov ah, 2
+        int 10h 
         ;guardamos el segundo digito del primer numero            
         mov ah,01h
         int 21h
@@ -272,10 +282,15 @@ ret
         int 10h                 
         ;mostramos en pantalla 
         mov ah,09h
-        lea dx, sumaIndicacion2
+        lea dx, pedirNum2
         int 21h
         
         val1SegundoDigito:
+        ;configuramos consola                      
+        mov dh, 11 ;fila
+        mov dl, 45 ;columna  
+        mov ah, 2
+        int 10h
         ;guardamos el primer digito del segundo numero                        
         mov ah,01h
         int 21h
@@ -288,6 +303,11 @@ ret
         add bl,al 
         
         val2SegundoDigito:
+        ;configuramos consola                      
+        mov dh, 11 ;fila
+        mov dl, 46 ;columna  
+        mov ah, 2
+        int 10h
         ;guardamos el segundo digito del segundo numero                                    
         mov ah,01h
         int 21h
@@ -296,6 +316,8 @@ ret
         cmp al, 57
         ja  val2SegundoDigito
         sub al,30h
+        
+        fncSuma:
         ;sumamos el digito2 de num1 con digito2 de num2            
         add cl,al
         
@@ -307,9 +329,123 @@ ret
         
         ;mostramos el resultado            
         mov ah,09h
-        lea dx,sumaResultado 
+        lea dx,mostrarResultado 
         int 21h
                     
+        call pcs_mostrarResultado
+            ret
+        pcs_suma endp
+        
+        pcs_multiplicacion proc
+        call pcs_encabezado
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 25 ;columna  
+        mov ah, 2
+        int 10h 
+        ;mostramos en pantalla
+        mov ah,09h
+        lea dx, pedirNum1
+        int 21h
+                    
+        ;configuramos consola                      
+        mov dh, 11 ;fila
+        mov dl, 25 ;columna  
+        mov ah, 2
+        int 10h 
+        ;mostramos en pantalla
+        mov ah,09h
+        lea dx, pedirNum2
+        int 21h   
+        
+        
+        val1PrimerDigitoMultiplicacion:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 45 ;columna  
+        mov ah, 2
+        int 10h
+        ;guardamos el primer digito del primer numero            
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val1PrimerDigitoMultiplicacion
+        cmp al, 57
+        ja  val1PrimerDigitoMultiplicacion
+        sub al,30h
+        mov ch,al
+        
+        val2PrimerDigitoMultiplicacion:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 46 ;columna  
+        mov ah, 2
+        int 10h 
+        ;guardamos el segundo digito del primer numero            
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val2PrimerDigitoMultiplicacion
+        cmp al, 57
+        ja  val2PrimerDigitoMultiplicacion
+        sub al,30h
+        mov bl,al  
+        
+        valSegundoDigitoMultiplicacion:
+        ;configuramos consola                      
+        mov dh, 11 ;fila
+        mov dl, 45 ;columna  
+        mov ah, 2
+        int 10h
+        
+        ;guardamos el primer digito del segundo numero                        
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  valSegundoDigitoMultiplicacion
+        cmp al, 57
+        ja  valSegundoDigitoMultiplicacion
+        sub al,30h 
+        mov cl, al  
+        mov al, 0
+        mov ah, 0
+        
+        mov x,  0
+        mov y,  0
+        
+        fncmultiplicar:
+        ;sumamos el digito2 de num1 n veces que indique el num2
+        
+        cmp x, cl
+        je  mult2digito
+        inc x
+        add al, bl
+        jmp fncmultiplicar
+         
+        mult2digito:
+        cmp y, cl
+        je  imprimirResultado
+        inc y
+        add ah, ch
+        jmp mult2digito
+        
+        imprimirResultado:
+        mov cl, al
+        mov bl, ah
+        
+        mov dh, 14 ;fila
+        mov dl, 25 ;columna 
+        mov ah, 2
+        int 10h  
+        ;mostramos titulo 
+        mov dx, offset mostrarResultado
+        mov ah, 9
+        int 21h
+        call pcs_mostrarResultado    
+            ret
+        pcs_multiplicacion endp
+        
+        pcs_mostrarResultado proc     
         mov ax,cx
         ;ajuste para convertir hexadecimal a decimal
         aam
@@ -338,9 +474,8 @@ ret
         int 21h
         jmp call pcs_menuOperacionesBasicas
             ret
-        pcs_suma endp
-        
-  
+        pcs_mostrarResultado endp               
+                       
 ;bloque menu encabezado
 msgTitulo db  "Arquitectura de Computadoras II", "$" 
 msgSemetre db "Octavo Semestre 2022", "$"
@@ -357,6 +492,10 @@ opt1Opcion2 db "Resta                       [2]", "$"
 opt1Opcion3 db "Multiplicacion              [3]", "$"
 opt1Opcion4 db "Regresar                    [4]", "$"
 ;bloque suma
-sumaIndicacion1 db "Ingrese numero 1: " , "$"
-sumaIndicacion2 db "Ingrese numero 2: " , "$"
-sumaResultado db   "El resultado es: ", "$" 
+pedirNum1 db "Ingrese numero 1: " , "$"
+pedirNum2 db "Ingrese numero 2: " , "$"
+mostrarResultado db   "El resultado es: ", "$" 
+mostrarResultadoNegativo db   "El resultado es: -", "$" 
+;variable para disenio
+x db 0
+y db 0
