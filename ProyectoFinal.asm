@@ -141,39 +141,13 @@ ret
         pcs_menuOperacionesBasicas proc
         call pcs_encabezado
         call pcs_indicaciones
-        ;configuramos consola
-        mov dh, 4 ;fila
-        mov dl, 20 ;columna 
-        mov ah, 2
-        int 10h  
-        ;mostramos titulo 
-        mov dx, offset msgTitulo
-        mov ah, 9
-        int 21h
-        ;configuramos consola                      
-        mov dh, 5 ;fila
-        mov dl, 25 ;columna  
-        mov ah, 2
-        int 10h  
-        ;mostramos semestre
-        mov dx, offset msgSemetre
-        mov ah, 9
-        int 21h
-        ;configuramos consola                      
-        mov dh, 10 ;fila
-        mov dl, 5 ;columna  
-        mov ah, 2
-        int 10h  
-        ;mostramos semestre
-        mov dx, offset msgIdicacion
-        mov ah, 9
-        int 21h 
+        
         ;configuramos consola                      
         mov dh, 12 ;fila
         mov dl, 15 ;columna  
         mov ah, 2
         int 10h  
-        ;mostramos semestre
+        ;mostramos suma
         mov dx, offset opt1Opcion1
         mov ah, 9
         int 21h
@@ -182,7 +156,7 @@ ret
         mov dl, 15 ;columna  
         mov ah, 2
         int 10h  
-        ;mostramos semestre
+        ;mostramos resta
         mov dx, offset opt1Opcion2
         mov ah, 9
         int 21h
@@ -191,7 +165,7 @@ ret
         mov dl, 15 ;columna  
         mov ah, 2
         int 10h  
-        ;mostramos semestre
+        ;mostramos multiplicacion
         mov dx, offset opt1Opcion3
         mov ah, 9
         int 21h
