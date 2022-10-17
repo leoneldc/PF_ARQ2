@@ -114,29 +114,29 @@ ret
         
         
         validarMainMenu proc
-            validar:
-            ;configuramos consola                      
-            mov dh, 10 ;fila
-            mov dl, 44 ;columna  
-            mov ah, 2
-            int 10h 
-            ; recibir informacion del teclado
-            mov ah, 1
-            int 21h 
-            ;validamos la opcion
-            cmp al,31h
-            je call pcs_menuOperacionesBasicas
-            cmp al,32h
-            je opcion1
-            cmp al,33h
-            je opcion1
-            cmp al,34h
-            je opcion1
-            cmp al,35h
-            je salida
-            jne call validarMainMenu
-                ret
-            validarMainMenu endp
+        validar:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 44 ;columna  
+        mov ah, 2
+        int 10h 
+        ; recibir informacion del teclado
+        mov ah, 1
+        int 21h 
+        ;validamos la opcion
+        cmp al,31h
+        je call pcs_menuOperacionesBasicas
+        cmp al,32h
+        je opcion1
+        cmp al,33h
+        je opcion1
+        cmp al,34h
+        je opcion1
+        cmp al,35h
+        je salida
+        jne call validarMainMenu
+            ret
+        validarMainMenu endp
         
         pcs_menuOperacionesBasicas proc
         call pcs_encabezado
@@ -222,7 +222,7 @@ ret
         cmp al,31h
         je call pcs_suma
         cmp al,32h
-        je opcion1
+        je call pcs_resta
         cmp al,33h
         je pcs_multiplicacion
         cmp al,34h
@@ -326,7 +326,6 @@ ret
         mov dl, 25 ;columna  
         mov ah, 2
         int 10h    
-        
         ;mostramos el resultado            
         mov ah,09h
         lea dx,mostrarResultado 
@@ -335,6 +334,174 @@ ret
         call pcs_mostrarResultado
             ret
         pcs_suma endp
+        
+        
+        pcs_resta proc
+        call pcs_encabezado
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 25 ;columna  
+        mov ah, 2
+        int 10h 
+        ;mostramos en pantalla
+        mov ah,09h
+        lea dx, pedirNum1
+        int 21h
+        
+        val1PrimerDigitoResta:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 45 ;columna  
+        mov ah, 2
+        int 10h
+        ;guardamos el primer digito del primer numero            
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val1PrimerDigitoResta
+        cmp al, 57
+        ja  val1PrimerDigitoResta
+        sub al,30h
+        mov bl,al
+        
+        val2PrimerDigitoResta:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 46 ;columna  
+        mov ah, 2
+        int 10h 
+        ;guardamos el segundo digito del primer numero            
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val2PrimerDigitoResta
+        cmp al, 57
+        ja  val2PrimerDigitoResta
+        sub al,30h
+        mov cl,al
+                    
+        ;configuramos consola                      
+        mov dh, 11 ;fila
+        mov dl, 25 ;columna  
+        mov ah, 2
+        int 10h                 
+        ;mostramos en pantalla 
+        mov ah,09h
+        lea dx, pedirNum2
+        int 21h
+        
+        
+        val1SegundoDigitoResta:
+        ;configuramos consola                      
+        mov dh, 11 ;fila
+        mov dl, 45 ;columna  
+        mov ah, 2
+        int 10h
+        ;guardamos el primer digito del segundo numero                        
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val1SegundoDigitoResta
+        cmp al, 57
+        ja  val1SegundoDigitoResta
+        sub al,30h
+        mov ch, al
+        
+        val2SegundoDigitoResta:
+        ;configuramos consola                      
+        mov dh, 11 ;fila
+        mov dl, 46 ;columna  
+        mov ah, 2
+        int 10h
+        ;guardamos el segundo digito del segundo numero                                    
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val2SegundoDigitoResta
+        cmp al, 57
+        ja  val2SegundoDigitoResta
+        sub al,30h
+        
+        mov x,  0
+        mov y,  0
+        mov agrupar1, 0
+        mov agrupar2, 0
+         
+        Num1D1Agrupar: 
+        cmp x, bl
+        je  Num1D2Agrupar
+        inc x
+        add agrupar1, 0Ah
+        jmp Num1D1Agrupar
+        
+        Num1D2Agrupar:
+        add agrupar1, cl
+        mov x, 0
+        
+        
+        Num2D1Agrupar: 
+        cmp x, ch
+        je  restar
+        inc x
+        add agrupar2, 0Ah
+        jmp Num2D1Agrupar
+        
+        restar:
+        add agrupar2, al
+        
+        mov bl, agrupar1
+        mov cl, agrupar2 
+        sub bl, cl 
+        jnc num1Mayor
+        not bl
+        add bl, 01h     
+                
+        ;mostramos en pantalla
+        mov dh, 14 ;fila
+        mov dl, 25 ;columna 
+        mov ah, 2
+        int 10h  
+        ;mostramos titulo 
+        mov dx, offset mostrarResultadoNegativo
+        mov ah, 9
+        int 21h
+        jmp imprimirResta
+        
+        num1Mayor:
+        ;mostramos en pantalla
+        mov dh, 14 ;fila
+        mov dl, 25 ;columna 
+        mov ah, 2
+        int 10h  
+        ;mostramos titulo 
+        mov dx, offset mostrarResultado
+        mov ah, 9
+        int 21h
+        
+                      
+        imprimirResta:
+        mov ax,bx           
+        aam
+        mov bx,ax
+        ;se imprime las decenas            
+        mov ah,02h
+        mov dl,bh
+        add dl,30h
+        int 21h 
+        ;se imprime las unidades  
+        mov ah,02h
+        mov dl,bl
+        add dl,30h
+        int 21h         
+        mov ah,01h
+        int 21h
+        
+        jmp call pcs_menuOperacionesBasicas
+         
+            ret
+        pcs_resta endp
+                    
+        
         
         pcs_multiplicacion proc
         call pcs_encabezado
@@ -494,8 +661,10 @@ opt1Opcion4 db "Regresar                    [4]", "$"
 ;bloque suma
 pedirNum1 db "Ingrese numero 1: " , "$"
 pedirNum2 db "Ingrese numero 2: " , "$"
-mostrarResultado db   "El resultado es: ", "$" 
-mostrarResultadoNegativo db   "El resultado es: -", "$" 
+mostrarResultado db   "El resultado es:   ", "$" 
+mostrarResultadoNegativo db   "El resultado es:   -", "$" 
 ;variable para disenio
 x db 0
 y db 0
+agrupar1 db 0
+agrupar2 db 0
