@@ -131,7 +131,7 @@ ret
         cmp al,33h
         je opcion1
         cmp al,34h
-        je opcion1
+        je pcs_fibonacci
         cmp al,35h
         je salida
         jne call validarMainMenu
@@ -174,7 +174,7 @@ ret
         mov dl, 15 ;columna  
         mov ah, 2
         int 10h  
-        ;mostramos semestre
+        ;mostramos regresamos
         mov dx, offset opt1Opcion4
         mov ah, 9
         int 21h  
@@ -615,7 +615,173 @@ ret
         int 21h
         jmp call pcs_menuOperacionesBasicas
             ret
-        pcs_mostrarResultado endp               
+        pcs_mostrarResultado endp
+        
+        
+        pcs_fibonacci proc
+        call pcs_encabezado
+        ;configuramos consola                      
+        mov dh, 07 ;fila
+        mov dl, 10 ;columna  
+        mov ah, 2
+        int 10h 
+        ;mostramos en pantalla
+        mov ah,09h
+        lea dx, avisoFibonacci
+        int 21h
+        ;configuramos consola                      
+        mov dh, 09 ;fila
+        mov dl, 10 ;columna  
+        mov ah, 2
+        int 10h 
+        ;mostramos en pantalla
+        mov ah,09h
+        lea dx, pedirNumFibonacci
+        int 21h
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 10 ;columna  
+        mov ah, 2
+        int 10h 
+        ;mostramos en pantalla
+        mov ah,09h
+        lea dx, pedirNum2Fibonacci
+        int 21h
+        
+        val1PrimerDigitoFib:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 50 ;columna  
+        mov ah, 2
+        int 10h
+        ;guardamos el primer digito del primer numero            
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val1PrimerDigitoFib
+        cmp al, 57
+        ja  val1PrimerDigitoFib
+        sub al,30h
+        mov ch,al
+        
+        val2PrimerDigitoFib:
+        ;configuramos consola                      
+        mov dh, 10 ;fila
+        mov dl, 51 ;columna  
+        mov ah, 2
+        int 10h 
+        ;guardamos el segundo digito del primer numero            
+        mov ah,01h
+        int 21h
+        cmp al, 48
+        jb  val2PrimerDigitoFib
+        cmp al, 57
+        ja  val2PrimerDigitoFib
+        sub al,30h
+        mov cl,al 
+        
+        mov x,  0
+        mov agrupar1, 0
+         
+        Agrupar1Fib: 
+        cmp x, ch
+        je  Agrupar2Fib
+        inc x
+        add agrupar1, 0Ah
+        jmp Agrupar1Fib
+                     
+        Agrupar2Fib:
+        add agrupar1, cl
+        
+        cmp agrupar1, 25
+        jb aceptarPosi
+        
+        call pcs_fibonacci
+        
+        aceptarPosi:
+        mov x, 0
+        mov ax, 1
+        mov dx, 0
+        mov cx, 0
+        mov es, cx
+        mov cl, agrupar1
+                      
+        bucleFibonacci:
+        cmp x, cl
+        je  resultadoFibonacci
+        mov es, ax
+        add ax, dx
+        mov [002h + bx], ax
+        inc bx
+        inc x
+        mov dx, es
+        jmp bucleFibonacci  
+        
+         
+        resultadoFibonacci:
+        mov dh, 14 ;fila
+        mov dl, 25 ;columna 
+        mov ah, 2
+        int 10h  
+        ;mostramos titulo 
+        mov dx, offset mostrarResultado
+        mov ah, 9
+        int 21h
+        
+        mov ax, es
+        call pcs_mostrarR2
+        jmp inicio
+            ret
+        pcs_fibonacci endp   
+        
+        
+        pcs_mostrarR2 proc
+            
+        mov cx,0
+        mov dx,0
+        label1:
+            ; if ax is zero
+            cmp ax,0
+            je print1             
+            ;initialize bx to 10
+            mov bx,10               
+            ; extract the last digit
+            div bx                          
+            ;push it in the stack
+            push dx                     
+            ;increment the count
+            inc cx             
+            ;set dx to 0
+            xor dx,dx
+            jmp label1
+        print1:
+            ;check if count
+            ;is greater than zero
+            cmp cx,0
+            je finFib    
+            ;pop the top of stack
+            pop dx
+            ;add 48 so that it
+            ;represents the ASCII
+            ;value of digits
+            add dx,48
+            ;interrupt to print a
+            ;character
+            mov ah,02h
+            int 21h
+            ;decrease the count
+            dec cx
+            jmp print1
+                   
+        finFib:
+        mov ah,01h
+        int 21h
+            
+            ret
+            
+        pcs_mostrarR2 endp
+        
+        
                        
 ;bloque menu encabezado
 msgTitulo db  "Arquitectura de Computadoras II", "$" 
@@ -625,7 +791,7 @@ msgIdicacion db "Elija una de las siguientes opciones:", "$"
 msgOpcion1 db "Operaciones Basicas         [1]", "$"
 msgOpcion2 db "Operaciones con Cadenas     [2]", "$"
 msgOpcion3 db "Juego                       [3]", "$"
-msgOpcion4 db "Operaciones de Recurrencia  [4]", "$"
+msgOpcion4 db "Sucesion de  Fibonacci      [4]", "$"
 msgOpcion5 db "Salida                      [5]", "$"
 ;blqoue menu funciones aritmeticas
 opt1Opcion1 db "Suma                        [1]", "$"
@@ -642,3 +808,7 @@ x db 0
 y db 0
 agrupar1 db 0
 agrupar2 db 0
+;bloque sucesion de fibonacci
+pedirNumFibonacci db "Ingrese que posicion de la" , "$"  
+pedirNum2Fibonacci db "sucesion de fibonacci desea conocer: " , "$"
+avisoFibonacci db "NOTA: Ingrese una posicion entre 0 a 24", "$"
