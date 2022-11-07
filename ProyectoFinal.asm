@@ -8,15 +8,10 @@ inicio:
 call  pcs_encabezado
 call  pcs_indicaciones   
 call  pcs_mainMenu 
-
-opcion1:
-ret
     
 salida:
 ret                  
-
-
-        
+      
         pcs_encabezado proc
         ;limpiamos la pantalla
         mov ah, 0Fh
@@ -38,7 +33,7 @@ ret
         mov ah, 2
         int 10h  
         ;mostramos semestre
-        mov dx, offset msgSemetre
+        mov dx, offset msgSemestre
         mov ah, 9
         int 21h
             ret     
@@ -127,9 +122,9 @@ ret
         cmp al,31h
         je call pcs_menuOperacionesBasicas
         cmp al,32h
-        je opcion1
+        je call pcs_palindromo
         cmp al,33h
-        je opcion1
+        je call pcs_ahorcado
         cmp al,34h
         je pcs_fibonacci
         cmp al,35h
@@ -137,6 +132,8 @@ ret
         jne call validarMainMenu
             ret
         validarMainMenu endp
+
+;inicio opcion 1
         
         pcs_menuOperacionesBasicas proc
         call pcs_encabezado
@@ -474,8 +471,7 @@ ret
          
             ret
         pcs_resta endp
-                    
-        
+                            
         
         pcs_multiplicacion proc
         call pcs_encabezado
@@ -617,7 +613,392 @@ ret
             ret
         pcs_mostrarResultado endp
         
+;inicio opcion 2 
+
+        pcs_palindromo proc         
+        main: 
+        call pcs_encabezado
+
+        ;posicion en pantalla
+        mov dh, 9 ;fila
+        mov dl, 5 ;columna  
+        mov ah, 2
+        int 10h 
+        ;mensaje de bienvenida 
+        mov dx, offset palindromo1
+        mov ah, 9
+        int 21h
         
+        ;posicion en pantalla
+        mov dh, 10 ;fila
+        mov dl, 5 ;columna  
+        mov ah, 2
+        int 10h  
+        ;mensaje de cantidad de caracteres
+        mov dx, offset palindromo2
+        mov ah, 9
+        int 21h 
+        
+        ;introducir tamaño de la cadena
+        mov ah,01h
+        int 21h
+        
+        ;verificar si el numero se encuentra en el rango 0 a 9
+        cmp al,030h  
+        js datoincorrecto
+        cmp al,03ah  
+        jns datoincorrecto
+        ;ajustando el valor de al para almacenarlo en n
+        sub al,30h
+        mov n,al
+        mov bh,al
+            
+        ;mensaje para ingresar la cadena
+        mov dx, offset palindromo3
+        mov ah, 9
+        int 21h 
+                 
+        ;ciclo para introducir la cadena
+        mov cl,n
+        mov si,0
+                       
+        ingresocadena:
+        mov ah,01h
+        int 21h
+        mov p[si],al
+        mov p1[si],al
+        inc si
+        dec bh
+        jnz ingresocadena
+        jmp comparar 
+                  
+        comparar:
+        ;segundo ciclo para comprobar si la cadena es palindroma
+        mov cl,n
+        mov si,0
+        ;limpiando contenido de ax
+        xor ax,ax
+        ;moviendo registro n a al
+        mov al,n
+          
+        mov di,ax 
+           
+        ciclocompara:
+        dec di
+        mov al,p[si]
+        mov dl,p1[di]
+        inc si
+        cmp al,dl
+        jnz nocumple  
+        loopne ciclocompara
+        
+        ;posicion en pantalla
+        mov dh, 12 ;fila
+        mov dl, 5 ;columna  
+        mov ah, 2
+        int 10h  
+        ;comprobacion exitosa
+        mov dx, offset espalindromo
+        mov ah, 9
+        int 21h
+        jmp salir
+                 
+        nocumple:    
+        ;posicion en pantalla
+        mov dh, 12 ;fila
+        mov dl, 5 ;columna  
+        mov ah, 2
+        int 10h  
+        ;comprobacion sin exito
+        mov dx, offset noespalindromo
+        mov ah, 9
+        int 21h
+        jmp salir
+           
+        datoincorrecto:
+        ;posicion en pantalla
+        mov dh, 11 ;fila
+        mov dl, 5 ;columna  
+        mov ah, 2
+        int 10h  
+        ;mensaje para pedir otro dato
+        mov dx, offset repingreso
+        mov ah, 9
+        int 21h
+            
+        salir: 
+        ;posicion en pantalla        
+        mov dh, 15 ;fila
+        mov dl, 5 ;columna  
+        mov ah, 2
+        int 10h  
+        ;mensaje para realizar otra operacion
+        mov dx, offset otrapalabra
+        mov ah, 9
+        int 21h
+        
+        mov ah,01h
+        int 21h
+        cmp al,'s'
+        jz main
+        
+        jmp inicio
+        ret
+        pcs_palindromo endp
+
+;inicio opcion 3
+ 
+        pcs_ahorcado proc 
+        call pcs_encabezado 
+        
+        
+        IM:
+          mov dh, 8 ;fila
+          mov dl, 0 ;columna  
+          mov ah, 2
+          int 10h 
+          mov dx, offset MSG_OCULTA
+          call mostrarmsg
+          mov dx, offset MSG_ADIVINE
+          call mostrarmsg
+          call ingresar
+          call crearoculta
+          mov dx, offset ADIVINO
+    
+        CM: 
+          cmp vidas, 0
+          je FMP
+          call compara
+          cmp cx, 0
+          je FMG
+          add FILA, 2
+          call setcursor
+          call mostrarmsg
+          call ingresarletra
+          call buscar
+          cmp cx, 0
+          je PM            
+          call reemplazar
+          cmp cx, 1
+          je PM
+          jmp CM
+               
+        PM:
+          mov columna, 11
+          call setcursor
+          call mostrarchar
+          mov columna, 0
+          call setcursor
+          call quitarvida
+          jmp CM          
+    
+        FMG:
+          add FILA, 2
+          call setcursor
+          call mostrarmsg  
+          add FILA, 2
+          call setcursor  
+          mov dx, offset MSG_GANO
+          call mostrarmsg
+          jmp Repetir          
+    
+        FMP:
+          add FILA, 2
+          call setcursor
+          mov dx, offset MSG_PERDIO
+          call mostrarmsg
+          mov dx, offset SECRETA
+          call mostrarmsg
+    
+        Repetir:
+        ;mensaje para jugar de nuevo
+          mov dx, offset jugarotravez
+          mov ah, 9
+          int 21h
+        
+          mov ah,01h
+          int 21h
+          cmp al,'s'
+          jz call pcs_ahorcado proc
+        
+          jmp inicio 
+        
+        pcs_ahorcado endp
+         
+        ingresar proc 
+        II: 
+          push cx
+          push di
+          mov cl, MAX_LARGO
+          mov di, offset SECRETA
+          mov ch, 0 ; el contador esta en cero
+        IC: 
+          mov ah, 07h
+          int 21h
+          cmp cl, ch ; si esta al limite
+          je FI
+          cmp al, 13
+          je FI
+          mov [di], al
+          inc di
+          inc ch  ; conto una letra
+          jmp IC
+        FI: 
+          inc di
+          mov [di], '$'
+          mov aux, ch
+          pop di
+          pop cx
+          ret
+        ingresar endp                  
+        
+        crearoculta proc
+          ;limpiamos la pantalla
+          mov ah, 0Fh
+          int 10h
+          mov ah, 0
+          int 10h            
+        ICR:
+          push di
+          push cx    
+          mov ch, 0
+          mov cl, AUX
+          mov di, offset ADIVINO
+        CC: 
+          cmp cx, 0
+          je FC
+          mov [di],'*'
+          dec cx
+          inc di
+          jmp CC              
+        FC:
+          inc di
+          mov [di], '$'
+          pop cx
+          pop di
+          ret
+        crearoculta endp
+        
+        ingresarletra proc 
+        INI:push ax
+            mov ah, 07h
+            int 21h  
+        INF:mov CHAR, al
+            pop ax
+        ingresarletra endp
+                             
+        compara proc 
+        ICMP:push ax
+             push di
+             push si              
+             mov cx, 0 ; <-- en principio ambas cadenas son iguales x_x
+             mov di, offset SECRETA
+             mov si, offset ADIVINO
+        CCMP:mov ah, [di]
+             mov al, [si]        
+             cmp ah, '$'
+             je FCMP                                  
+             cmp ah, al
+             je CSIG
+             jmp CPRO
+        CSIG:inc di
+             inc si
+             jmp CCMP
+        CPRO:mov cx, 1
+        FCMP:pop si
+             pop di
+             pop ax
+             ret
+        compara endp                              
+                                                   
+        reemplazar proc 
+        IR: push si
+            push di
+            push ax
+            mov cx, 0
+            mov si, offset ADIVINO
+            mov di, offset SECRETA
+            mov al, CHAR      
+        CR: cmp [di], '$'
+            je FR
+            cmp [di], al
+            je CPR
+            inc di
+            inc si
+            jmp CR
+        CPR:cmp [si], '*'
+            je RMP
+            mov cx, 1
+            jmp FR            
+        RMP:mov [si], al
+            inc si
+            inc di
+            jmp CR            
+        FR: pop ax
+            pop di
+            pop si
+            ret
+        reemplazar endp
+        
+        buscar proc 
+        IB:push di
+            push ax    
+            mov cx, 0 ; en principio no esta el caracter ingresado
+            mov di, offset SECRETA; una direccion de memoria a recorrer
+            mov al, CHAR
+        CB: cmp [di], '$'
+            je FB
+            cmp [di], al
+            je PB
+            inc di
+            jmp CB            
+        PB: mov cx, 1      
+        FB: pop ax
+            pop di
+            ret
+        buscar endp
+        
+        quitarvida proc 
+        IQV:sub VIDAS, 1
+            ret
+        quitarvida endp
+        
+        mostrarmsg proc 
+        IMS:push ax
+            mov ah, 09h
+            int 21h
+        FMS:pop ax
+            ret
+        mostrarmsg endp
+                           
+        mostrarchar proc 
+            push ax
+            push dx
+            mov dl, CHAR    
+            mov ah, 02h
+            int 21h
+            pop dx
+            pop ax
+            ret
+        mostrarchar endp                  
+                           
+        setcursor proc 
+            push dx
+            push bx
+            push ax
+            mov dh, 3    ; fila
+            mov dl, 2    ; columna
+            mov bh, 0    ; nro pagina
+            mov ah, 02h
+            int 10h
+            pop ax
+            pop bx
+            pop dx
+            ret
+        setcursor endp
+        
+;inicio opcion 4
+               
         pcs_fibonacci proc
         call pcs_encabezado
         ;configuramos consola                      
@@ -781,11 +1162,10 @@ ret
             
         pcs_mostrarR2 endp
         
-        
-                       
+                               
 ;bloque menu encabezado
 msgTitulo db  "Arquitectura de Computadoras II", "$" 
-msgSemetre db "Octavo Semestre 2022", "$"
+msgSemestre db "Octavo Semestre 2022", "$"
 msgIdicacion db "Elija una de las siguientes opciones:", "$"
 ;bloque menu principal
 msgOpcion1 db "Operaciones Basicas         [1]", "$"
@@ -793,7 +1173,7 @@ msgOpcion2 db "Operaciones con Cadenas     [2]", "$"
 msgOpcion3 db "Juego                       [3]", "$"
 msgOpcion4 db "Sucesion de  Fibonacci      [4]", "$"
 msgOpcion5 db "Salida                      [5]", "$"
-;blqoue menu funciones aritmeticas
+;bloque menu funciones aritmeticas
 opt1Opcion1 db "Suma                        [1]", "$"
 opt1Opcion2 db "Resta                       [2]", "$"
 opt1Opcion3 db "Multiplicacion              [3]", "$"
@@ -802,7 +1182,34 @@ opt1Opcion4 db "Regresar                    [4]", "$"
 pedirNum1 db "Ingrese numero 1: " , "$"
 pedirNum2 db "Ingrese numero 2: " , "$"
 mostrarResultado db   "El resultado es:   ", "$" 
-mostrarResultadoNegativo db   "El resultado es:   -", "$" 
+mostrarResultadoNegativo db   "El resultado es:   -", "$"
+;variables para operar cadenas
+p db 10 dup(?)
+p1 db 10 dup(?)
+n db 0 
+;bloque verificar cadenas palindromas
+palindromo1 db "Programa para verificar si una cadena es palindroma", "$"
+palindromo2 db "Introduce la cantidad de caracteres de la cadena: ", "$"
+palindromo3 db 10,13, "     Introduce la cadena: ", "$"
+espalindromo db "La cadena es palindroma", "$"
+noespalindromo db "La cadena no es palindroma", "$"
+otrapalabra db "Para realizar otra operacion marque", " 's',", " para salir cualquier tecla: ", "$"
+repingreso db "La tecla presionada no es un numero", "$" 
+;bloque juego ahorcado
+MAX_LARGO equ 14
+SECRETA db MAX_LARGO+1 dup ('$')
+ADIVINO db MAX_LARGO+1 dup ('$')
+jugarotravez DB 13,10,"Para jugar de nuevo oprima ", "'s', ", "para salir cualquier tecla: ","$" 
+MSG_PERDIO db "Lo siento, la palabra era $"
+MSG_GANO db "Felicitaciones!$"
+MSG_OCULTA db "Ingrese una palabra y presione Enter.", 13, 10, "$"
+MSG_ADIVINE db "Adivine la palabra oculta!", 13, 10, "$"
+CRLF db 13, 10, "$"
+VIDAS equ aux
+AUX db ? ; el largo de la palabra ingresada
+CHAR db ?
+FILA db 0
+COLUMNA db 0
 ;variable para disenio
 x db 0
 y db 0
@@ -811,4 +1218,6 @@ agrupar2 db 0
 ;bloque sucesion de fibonacci
 pedirNumFibonacci db "Ingrese que posicion de la" , "$"  
 pedirNum2Fibonacci db "sucesion de fibonacci desea conocer: " , "$"
-avisoFibonacci db "NOTA: Ingrese una posicion entre 0 a 24", "$"
+avisoFibonacci db "NOTA: Ingrese una posicion entre 0 a 24", "$" 
+
+
